@@ -21,8 +21,8 @@ const onSceneMount = (e: SceneEventArgs) => {
     createCamera();
     createGround();
     createCampfireLogs();
-    const { pointLight } = createLightAndShadows();
     const { fire } = createFireModel();
+    const pointLight = createLightAndShadows();
     const easingFunction = createEasingFunction();
     animateFire(pointLight, fire, easingFunction);
     createFlameys(5000);
@@ -217,7 +217,7 @@ const onSceneMount = (e: SceneEventArgs) => {
         ground.receiveShadows = true;
     }
 
-    function createLightAndShadows(): { pointLight: BABYLON.PointLight; shadowGenerator: BABYLON.ShadowGenerator; } {
+    function createLightAndShadows(): BABYLON.PointLight {
         const hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
         hemiLight.diffuse = new BABYLON.Color3(0.45, 0.03, 0.93);
         hemiLight.specular = new BABYLON.Color3(0.03, 0.9, 0.93);
@@ -230,11 +230,7 @@ const onSceneMount = (e: SceneEventArgs) => {
         pointLight.shadowMaxZ = 7;
         pointLight.shadowMinZ = 1;
 
-        const shadowGenerator = new BABYLON.ShadowGenerator(1024, pointLight);
-        shadowGenerator.useContactHardeningShadow = true;
-        shadowGenerator.contactHardeningLightSizeUVRatio = 0.05;
-        shadowGenerator.setDarkness(0.8);
-        return { pointLight, shadowGenerator };
+        return pointLight;
     }
 
     function createCamera(): BABYLON.ArcRotateCamera {
