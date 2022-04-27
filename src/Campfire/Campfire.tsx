@@ -26,7 +26,7 @@ const onSceneMount = (e: SceneEventArgs) => {
     const pointLight = createLightAndShadows();
     const easingFunction = createEasingFunction();
     animateFire(pointLight, fire, easingFunction);
-    createFlameys(5000);
+    createFlameys(10000);
 
     const divFps = document.getElementById("fps");
     scene.getEngine().runRenderLoop(() => {
@@ -52,6 +52,8 @@ const onSceneMount = (e: SceneEventArgs) => {
 
         const flameyMat = new BABYLON.StandardMaterial("flameyMat");
         flameyMat.diffuseTexture = new BABYLON.Texture("https://assets.babylonjs.com/environments/spriteAtlas.png");
+        flameyMat.emissiveColor = new BABYLON.Color3(1, 1, 1);
+        flameyMat.disableLighting = true;
         spsMesh.material = flameyMat;
 
         sps.initParticles = () => {
@@ -80,6 +82,9 @@ const onSceneMount = (e: SceneEventArgs) => {
         const AMT_INIT = 20;
         const AMT_MULT = 1.1;
 
+        const COLOR_A = new BABYLON.Color4(0, 1, 0.78);
+        const COLOR_B = new BABYLON.Color4(1, 0, 0);
+
         let currentCircleFlameyId = 0;
         let currentRadius = R_INIT;
         let currentRadiusIncrement = R_INC;
@@ -90,11 +95,6 @@ const onSceneMount = (e: SceneEventArgs) => {
 
         for (let i = 0; i < sps.nbParticles; i++) {
             let particle = sps.particles[i];
-
-            // pick random sprite
-            const row = Math.floor(BABYLON.Scalar.RandomRange(0, 4));
-            const col = Math.floor(BABYLON.Scalar.RandomRange(0, 6));
-            particle.uvs = new BABYLON.Vector4(col / 6, row / 4, (col + 1) / 6, (row + 1) / 4);
 
             // calculate angle to get position
             let angle = currentCircleFlameyId * currentAngleStep;
@@ -111,6 +111,14 @@ const onSceneMount = (e: SceneEventArgs) => {
             // a bit of random scaling
             let randomScale = BABYLON.Scalar.RandomRange(0.2, 0.3);
             particle.scaling = new BABYLON.Vector3(randomScale, randomScale, randomScale);
+
+            // pick random sprite
+            const row = Math.floor(BABYLON.Scalar.RandomRange(0, 4));
+            const col = Math.floor(BABYLON.Scalar.RandomRange(0, 6));
+            particle.uvs = new BABYLON.Vector4(col / 6, row / 4, (col + 1) / 6, (row + 1) / 4);
+
+            // lerp color
+            particle.color = BABYLON.Color4.Lerp(COLOR_A, COLOR_B, currentRadius / 30);
 
             // figure out if we should stay on the same circle radius
             if (currentCircleFlameyId < currentCircleMaxAmt - 1) {
@@ -230,32 +238,32 @@ const onSceneMount = (e: SceneEventArgs) => {
         pointLight.diffuse = new BABYLON.Color3(0, 1, 0.78);
         pointLight.specular = new BABYLON.Color3(0, 1, 0.78);
         pointLight.intensity = 0.8;
-        // pointLight.shadowMaxZ = 7;
-        // pointLight.shadowMinZ = 1;
 
         return pointLight;
     }
 
     function createCamera(): PanningCamera {
+        const fixedAngle = Math.PI / 4;
+
         var camera = new PanningCamera('camera',
-            -Math.PI / 3,
-            Math.PI / 4,
-            6,
-            new BABYLON.Vector3(4, 7, -7)
+            0,
+            fixedAngle,
+            15,
+            new BABYLON.Vector3(0, 0, 0)
         );
+        camera.upperBetaLimit = fixedAngle;
+        camera.lowerBetaLimit = fixedAngle;
 
-        camera.attachControl(canvas, true, false/*, 1*/);
+        camera.attachControl(canvas, false, false);
 
+        camera.inputs.remove(camera.inputs.attached.keyboard);
+        camera.inputs.remove(camera.inputs.attached.mousewheel);
+
+        camera._panningMouseButton = 0;
         camera.panningAxis = new BABYLON.Vector3(1, 0, 1);
-        camera.wheelPrecision = 0.1;
-        camera.panningSensibility = 50;
-        camera.inertia = 0.1;
-        camera.panningInertia = 0.12;
-        camera._panningMouseButton = 0; // change functionality from left to right mouse button
-        camera.angularSensibilityX = 500;
-        camera.angularSensibilityY = 500;
-        camera.upperBetaLimit = Math.PI / 4;
-        camera.lowerBetaLimit = 0;
+        camera.panningSensibility = 500;
+        camera.panningInertia = 0.85;
+        camera.inertia = 0.85;
 
         return camera;
     }

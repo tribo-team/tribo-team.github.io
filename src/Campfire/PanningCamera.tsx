@@ -1,24 +1,16 @@
 import * as BABYLON from '@babylonjs/core';
 
 export class PanningCamera extends BABYLON.ArcRotateCamera {
-
     private _localDirection: BABYLON.Vector3 | undefined = undefined;
-
-    private _transformNormalToRef_forMapPanning(vector: BABYLON.Vector3, transformation: BABYLON.Matrix, result: BABYLON.Vector3) {
-        var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[8]) + (vector.z * transformation.m[4]);
-        var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[9]) + (vector.z * transformation.m[5]);
-        var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[10]) + (vector.z * transformation.m[6]);
-        result.x = x;
-        result.y = y;
-        result.z = z;
-    };
 
     override _checkInputs(): void {
         //if (async) collision inspection was triggered, don't update the camera's position - until the collision callback was called.
         if (this._collisionTriggered) {
             return;
         }
+
         this.inputs.checkInputs();
+
         // Inertia
         if (this.inertialAlphaOffset !== 0 || this.inertialBetaOffset !== 0 || this.inertialRadiusOffset !== 0) {
             if (this.getScene().useRightHandedSystem) {
@@ -39,6 +31,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
             if (Math.abs(this.inertialRadiusOffset) < this.speed * BABYLON.Epsilon)
                 this.inertialRadiusOffset = 0;
         }
+
         // Panning inertia
         if (this.inertialPanningX !== 0 || this.inertialPanningY !== 0) {
             if (!this._localDirection) {
@@ -48,14 +41,16 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
             this._localDirection.copyFromFloats(this.inertialPanningX, this.inertialPanningY, this.inertialPanningY);
             this._localDirection.multiplyInPlace(this.panningAxis);
             this._viewMatrix.invertToRef(this._cameraTransformMatrix);
+            
             //Eliminate y if map panning is enabled (panningAxis == 1,0,1)
             if (!this.panningAxis.y) {
-                this._transformNormalToRef_forMapPanning(this._localDirection, this._cameraTransformMatrix, this._transformedDirection);
+                this._transformNormalToRefForMapPanning(this._localDirection, this._cameraTransformMatrix, this._transformedDirection);
                 this._transformedDirection.y = 0;
             }
             else {
                 BABYLON.Vector3.TransformNormalToRef(this._localDirection, this._cameraTransformMatrix, this._transformedDirection);
             }
+
             if (!this._targetHost) {
                 if (this.panningDistanceLimit) {
                     this._transformedDirection.addInPlace(this._target);
@@ -68,6 +63,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
                     this._target.addInPlace(this._transformedDirection);
                 }
             }
+
             this.inertialPanningX *= this.panningInertia;
             this.inertialPanningY *= this.panningInertia;
             if (Math.abs(this.inertialPanningX) < this.speed * BABYLON.Epsilon)
@@ -75,8 +71,24 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
             if (Math.abs(this.inertialPanningY) < this.speed * BABYLON.Epsilon)
                 this.inertialPanningY = 0;
         }
+
         // Limits
         this._checkLimits();
-        //_super.prototype._checkInputs.call(this);
+
+        // super._checkInputs.call(this);
     }
+
+    private _transformNormalToRefForMapPanning(
+        vector: BABYLON.Vector3,
+        transformation: BABYLON.Matrix,
+        result: BABYLON.Vector3
+    ): void {
+        var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[8]) + (vector.z * transformation.m[4]);
+        var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[9]) + (vector.z * transformation.m[5]);
+        var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[10]) + (vector.z * transformation.m[6]);
+
+        result.x = x;
+        result.y = y;
+        result.z = z;
+    };
 }
