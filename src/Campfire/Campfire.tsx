@@ -5,7 +5,7 @@ import { PanningCamera } from './PanningCamera';
 export const Campfire = () => {
     return (
         <div style={{ flex: 1, display: "flex" }}>
-            <Engine antialias adaptToDeviceRatio canvasId="BabylonJS">
+            <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
                 <Scene
                     onSceneMount={onSceneMount}
                     children={undefined}
