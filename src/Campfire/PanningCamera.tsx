@@ -3,14 +3,9 @@ import * as BABYLON from '@babylonjs/core';
 export class PanningCamera extends BABYLON.ArcRotateCamera {
     private _localDirection: BABYLON.Vector3 | undefined = undefined;
 
-    override _checkInputs(): void {
+    public override _checkInputs(): void {
         //if (async) collision inspection was triggered, don't update the camera's position - until the collision callback was called.
         if (this._collisionTriggered) {
-            // this.alpha = this._previousAlpha;
-            // this.beta = this._previousBeta;
-            // this.position = this._previousPosition;
-            // this.radius = this._previousRadius;
-            console.log("collision!");
             return;
         }
 
@@ -80,7 +75,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
         // Limits
         this._checkLimits();
 
-        // super._checkInputs.call(this);
+        super._checkInputs.call(this);
     }
 
     private _transformNormalToRefForMapPanning(

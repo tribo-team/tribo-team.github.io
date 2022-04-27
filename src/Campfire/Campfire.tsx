@@ -245,12 +245,14 @@ const onSceneMount = (e: SceneEventArgs) => {
     function createCamera(): PanningCamera {
         const fixedAngle = Math.PI / 4;
 
-        var camera = new PanningCamera('camera',
+        const camera = new PanningCamera('camera',
             0,
             fixedAngle,
             15,
             new BABYLON.Vector3(0, 0, 0)
         );
+        camera.lowerAlphaLimit = 0;
+        camera.upperAlphaLimit = 0;
         camera.upperBetaLimit = fixedAngle;
         camera.lowerBetaLimit = fixedAngle;
 
@@ -261,21 +263,10 @@ const onSceneMount = (e: SceneEventArgs) => {
 
         camera._panningMouseButton = 0;
         camera.panningAxis = new BABYLON.Vector3(1, 0, 1);
+        camera.panningDistanceLimit = 40;
         camera.panningSensibility = 500;
         camera.panningInertia = 0.85;
         camera.inertia = 0.85;
-
-        // Collisions
-        scene.collisionsEnabled = true;
-
-        var cameraBounds = BABYLON.MeshBuilder.CreateCylinder("cameraBounds",
-            { height: 30, diameter: 40 }
-        );
-        cameraBounds.isVisible = false;
-        cameraBounds.checkCollisions = true;
-        
-        camera.collisionRadius = new BABYLON.Vector3(1, 1, 1);
-        camera.checkCollisions = true;
 
         return camera;
     }
