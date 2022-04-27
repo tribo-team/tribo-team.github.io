@@ -6,6 +6,11 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
     override _checkInputs(): void {
         //if (async) collision inspection was triggered, don't update the camera's position - until the collision callback was called.
         if (this._collisionTriggered) {
+            // this.alpha = this._previousAlpha;
+            // this.beta = this._previousBeta;
+            // this.position = this._previousPosition;
+            // this.radius = this._previousRadius;
+            console.log("collision!");
             return;
         }
 

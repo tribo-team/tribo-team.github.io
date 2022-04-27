@@ -265,6 +265,18 @@ const onSceneMount = (e: SceneEventArgs) => {
         camera.panningInertia = 0.85;
         camera.inertia = 0.85;
 
+        // Collisions
+        scene.collisionsEnabled = true;
+
+        var cameraBounds = BABYLON.MeshBuilder.CreateCylinder("cameraBounds",
+            { height: 30, diameter: 40 }
+        );
+        cameraBounds.isVisible = false;
+        cameraBounds.checkCollisions = true;
+        
+        camera.collisionRadius = new BABYLON.Vector3(1, 1, 1);
+        camera.checkCollisions = true;
+
         return camera;
     }
 }
