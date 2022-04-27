@@ -28,9 +28,11 @@ const onSceneMount = (e: SceneEventArgs) => {
     animateFire(pointLight, fire, easingFunction);
     createFlameys(5000);
 
+    const divFps = document.getElementById("fps");
     scene.getEngine().runRenderLoop(() => {
         if (scene) {
             scene.render();
+            divFps!.innerHTML = scene.getEngine().getFps().toFixed() + " fps";
         }
     });
 

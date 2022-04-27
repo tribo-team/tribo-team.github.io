@@ -1,11 +1,14 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Campfire } from './Campfire';
+import { Campfire } from './Campfire/Campfire';
 
 function App() {
   return (
     <div className="row">
+      <div id="fps">
+        0
+      </div>
       <div>
         <Campfire />
       </div>
