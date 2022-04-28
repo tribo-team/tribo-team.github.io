@@ -39,12 +39,13 @@
 
 #fps {
   position: absolute;
-  background-color: black;
-  text-align: center;
-  font-size: 16px;
-  color: white;
   top: 15px;
   right: 10px;
   width: 60px;
   height: 20px;
+  background-color: black;
+  text-align: center;
+  font-size: 16px;
+  color: white;
+  border-radius: 5px;
 }

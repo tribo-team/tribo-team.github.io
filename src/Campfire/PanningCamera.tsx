@@ -75,7 +75,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
         // Limits
         this._checkLimits();
 
-        super._checkInputs.call(this);
+        // super._checkInputs.call(this);
     }
 
     private _transformNormalToRefForMapPanning(
