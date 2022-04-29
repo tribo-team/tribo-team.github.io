@@ -1,9 +1,8 @@
-import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { Campfire } from "./Campfire/Campfire";
 
-function App() {
+function App(): JSX.Element {
   return (
     <div className="row">
       <div id="fps">0</div>

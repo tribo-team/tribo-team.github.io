@@ -3,17 +3,17 @@ import * as BABYLON from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 import { PanningCamera } from "./PanningCamera";
 
-export const Campfire = () => {
-  return (
-    <div style={{ flex: 1, display: "flex" }}>
-      <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
-        <Scene onSceneMount={onSceneMount} children={undefined} />
-      </Engine>
-    </div>
-  );
-};
+export const Campfire = (): JSX.Element => (
+  <div style={{ flex: 1, display: "flex" }}>
+    <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
+      <Scene onSceneMount={onSceneMount}>
+        <></>
+      </Scene>
+    </Engine>
+  </div>
+);
 
-const onSceneMount = async (e: SceneEventArgs) => {
+const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
   const { canvas, scene } = e;
 
   scene.getEngine().displayLoadingUI(); // TODO: use proper screen
@@ -29,7 +29,7 @@ const onSceneMount = async (e: SceneEventArgs) => {
   scene.getEngine().hideLoadingUI(); // TODO: use proper screen
 };
 
-function setupScene(scene: BABYLON.Scene) {
+function setupScene(scene: BABYLON.Scene): void {
   scene.clearColor = new BABYLON.Color4(0.15, 0.03, 0.29, 1.0);
 
   const divFps = document.getElementById("fps");
@@ -114,7 +114,7 @@ function animateFlameAndLight(
   pointLight: BABYLON.PointLight,
   flame: BABYLON.AbstractMesh,
   scene: BABYLON.Scene,
-) {
+): void {
   const animFlame = new BABYLON.Animation(
     "animFlame",
     "position.y",
@@ -196,7 +196,7 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
   });
 }
 
-function positionFlameys(sps: BABYLON.SolidParticleSystem) {
+function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
   const R_INIT = 2.4;
   const R_INC = 0.8;
   const R_INC_MULT = 1.0;
