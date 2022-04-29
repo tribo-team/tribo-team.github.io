@@ -6,9 +6,7 @@ import { Campfire } from './Campfire/Campfire';
 function App() {
   return (
     <div className="row">
-      <div id="fps">
-        0
-      </div>
+      <div id="fps">0</div>
       <div>
         <Campfire />
       </div>

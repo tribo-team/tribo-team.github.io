@@ -22,7 +22,13 @@
     "@types/node": "^16.11.29",
     "@types/react": "^18.0.7",
     "@types/react-dom": "^18.0.0",
-    "gh-pages": "^3.2.3"
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
+    "@typescript-eslint/parser": "^5.21.0",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "gh-pages": "^3.2.3",
+    "prettier": "^2.6.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -30,7 +36,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "lint": "eslint . --ext .tsx",
+    "lint-and-fix": "eslint . --ext .tsx --fix",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.tsx' --write"
   },
   "eslintConfig": {
     "extends": [
