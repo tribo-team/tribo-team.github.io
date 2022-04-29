@@ -1,4 +1,4 @@
-import * as BABYLON from '@babylonjs/core';
+import * as BABYLON from "@babylonjs/core";
 
 export class PanningCamera extends BABYLON.ArcRotateCamera {
   private _localDirection: BABYLON.Vector3 | undefined = undefined;
@@ -46,7 +46,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
       this._localDirection.copyFromFloats(
         this.inertialPanningX,
         this.inertialPanningY,
-        this.inertialPanningY
+        this.inertialPanningY,
       );
       this._localDirection.multiplyInPlace(this.panningAxis);
       this._viewMatrix.invertToRef(this._cameraTransformMatrix);
@@ -56,14 +56,14 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
         this._transformNormalToRefForMapPanning(
           this._localDirection,
           this._cameraTransformMatrix,
-          this._transformedDirection
+          this._transformedDirection,
         );
         this._transformedDirection.y = 0;
       } else {
         BABYLON.Vector3.TransformNormalToRef(
           this._localDirection,
           this._cameraTransformMatrix,
-          this._transformedDirection
+          this._transformedDirection,
         );
       }
 
@@ -72,7 +72,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
           this._transformedDirection.addInPlace(this._target);
           const distanceSquared = BABYLON.Vector3.DistanceSquared(
             this._transformedDirection,
-            this.panningOriginTarget
+            this.panningOriginTarget,
           );
           if (
             distanceSquared <=
@@ -102,7 +102,7 @@ export class PanningCamera extends BABYLON.ArcRotateCamera {
   private _transformNormalToRefForMapPanning(
     vector: BABYLON.Vector3,
     transformation: BABYLON.Matrix,
-    result: BABYLON.Vector3
+    result: BABYLON.Vector3,
   ): void {
     const x =
       vector.x * transformation.m[0] +

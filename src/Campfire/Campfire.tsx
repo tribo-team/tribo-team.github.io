@@ -1,11 +1,11 @@
-import { Engine, Scene, SceneEventArgs } from 'react-babylonjs';
-import * as BABYLON from '@babylonjs/core';
-import '@babylonjs/loaders/glTF';
-import { PanningCamera } from './PanningCamera';
+import { Engine, Scene, SceneEventArgs } from "react-babylonjs";
+import * as BABYLON from "@babylonjs/core";
+import "@babylonjs/loaders/glTF";
+import { PanningCamera } from "./PanningCamera";
 
 export const Campfire = () => {
   return (
-    <div style={{ flex: 1, display: 'flex' }}>
+    <div style={{ flex: 1, display: "flex" }}>
       <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
         <Scene onSceneMount={onSceneMount} children={undefined} />
       </Engine>
@@ -32,13 +32,13 @@ const onSceneMount = async (e: SceneEventArgs) => {
 function setupScene(scene: BABYLON.Scene) {
   scene.clearColor = new BABYLON.Color4(0.15, 0.03, 0.29, 1.0);
 
-  const divFps = document.getElementById('fps');
+  const divFps = document.getElementById("fps");
   scene.getEngine().runRenderLoop(() => {
     if (scene) {
       scene.render();
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      divFps!.innerHTML = scene.getEngine().getFps().toFixed() + ' fps';
+      divFps!.innerHTML = scene.getEngine().getFps().toFixed() + " fps";
     }
   });
 }
@@ -47,11 +47,11 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
   const fixedAngle = Math.PI / 4;
 
   const camera = new PanningCamera(
-    'camera',
+    "camera",
     0,
     fixedAngle,
     15,
-    new BABYLON.Vector3(0, 0, 0)
+    new BABYLON.Vector3(0, 0, 0),
   );
   camera.lowerAlphaLimit = 0;
   camera.upperAlphaLimit = 0;
@@ -74,13 +74,13 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
 }
 
 async function loadEnvironment(): Promise<BABYLON.AbstractMesh> {
-  const url = 'https://dl.dropbox.com/s/pbczbdwdjef9tre/triboscene.glb';
+  const url = "https://dl.dropbox.com/s/pbczbdwdjef9tre/triboscene.glb";
   const scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
 
-  const data = await BABYLON.SceneLoader.ImportMeshAsync('', url);
+  const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
   data.meshes[0].scaling = scaling;
 
-  const flameMesh = data.meshes.find((mesh) => mesh.name == 'Flame');
+  const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return flameMesh!; // we know it's in the scene
@@ -90,18 +90,18 @@ function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
   scene.createDefaultEnvironment();
 
   const hemiLight = new BABYLON.HemisphericLight(
-    'hemiLight',
+    "hemiLight",
     new BABYLON.Vector3(0, 1, 0),
-    scene
+    scene,
   );
   hemiLight.diffuse = new BABYLON.Color3(0, 1, 0.78);
   hemiLight.specular = new BABYLON.Color3(0, 1, 0.78);
   hemiLight.intensity = 0.2;
 
   const pointLight = new BABYLON.PointLight(
-    'pointLight',
+    "pointLight",
     new BABYLON.Vector3(0, 7, 0),
-    scene
+    scene,
   );
   pointLight.diffuse = new BABYLON.Color3(0, 1, 0.78);
   pointLight.specular = new BABYLON.Color3(0, 1, 0.78);
@@ -113,19 +113,19 @@ function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
 function animateFlameAndLight(
   pointLight: BABYLON.PointLight,
   flame: BABYLON.AbstractMesh,
-  scene: BABYLON.Scene
+  scene: BABYLON.Scene,
 ) {
   const animFlame = new BABYLON.Animation(
-    'animFlame',
-    'position.y',
+    "animFlame",
+    "position.y",
     30,
     BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+    BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE,
   );
   animFlame.setKeys([
     { frame: 0, value: 0.05 },
     { frame: 50, value: 0.45 },
-    { frame: 100, value: 0.05 }
+    { frame: 100, value: 0.05 },
   ]);
   const easingFunction = new BABYLON.CubicEase();
   easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
@@ -136,16 +136,16 @@ function animateFlameAndLight(
   scene.beginAnimation(flame, 0, 100, true);
 
   const animLight = new BABYLON.Animation(
-    'animLight',
-    'intensity',
+    "animLight",
+    "intensity",
     30,
     BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+    BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE,
   );
   animLight.setKeys([
     { frame: 0, value: 500 },
     { frame: 50, value: 1000 },
-    { frame: 100, value: 500 }
+    { frame: 100, value: 500 },
   ]);
   animLight.setEasingFunction(easingFunction);
 
@@ -155,22 +155,22 @@ function animateFlameAndLight(
 }
 
 function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
-  const sps = new BABYLON.SolidParticleSystem('sps', scene, {
-    isPickable: false
+  const sps = new BABYLON.SolidParticleSystem("sps", scene, {
+    isPickable: false,
   });
 
-  const tempFlameyMesh = BABYLON.MeshBuilder.CreatePlane('plane', {});
+  const tempFlameyMesh = BABYLON.MeshBuilder.CreatePlane("plane", {});
   sps.addShape(tempFlameyMesh, numberOfFlameys);
   tempFlameyMesh.dispose();
 
   const spsMesh = sps.buildMesh();
 
   const flameyTex = new BABYLON.Texture(
-    'https://dl.dropbox.com/s/8j3ui3gab760l01/sprite_triangle.png'
+    "https://dl.dropbox.com/s/8j3ui3gab760l01/sprite_triangle.png",
   );
   flameyTex.hasAlpha = true;
 
-  const flameyMat = new BABYLON.StandardMaterial('flameyMat');
+  const flameyMat = new BABYLON.StandardMaterial("flameyMat");
   flameyMat.diffuseTexture = flameyTex;
   flameyMat.useAlphaFromDiffuseTexture = true;
   flameyMat.emissiveColor = new BABYLON.Color3(1, 1, 1);
@@ -226,7 +226,7 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem) {
     particle.position = new BABYLON.Vector3(
       currentRadius * Math.cos(angle) + Math.random() * 0.4,
       0.55,
-      currentRadius * Math.sin(angle) + Math.random() * 0.4
+      currentRadius * Math.sin(angle) + Math.random() * 0.4,
     );
     // TODO: it might make sense to cache these to optimize later?
 
@@ -235,7 +235,7 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem) {
     particle.scaling = new BABYLON.Vector3(
       randomScale,
       randomScale,
-      randomScale
+      randomScale,
     );
 
     // lerp color
