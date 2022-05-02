@@ -256,8 +256,16 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
   // This will be used only for the next setParticles() calls
   sps.computeParticleTexture = false;
 
+  let time = 0;
   scene.onBeforeRenderObservable.add(() => {
-    sps.setParticles(); // rotate billboards
+    // rotate billboards
+    sps.setParticles();
+
+    // simple floating animation
+    time += scene.getEngine().getDeltaTime();
+    for (let i = 0; i < sps.nbParticles; i++) {
+      sps.particles[i].position.y = 0.55 + 0.08 * Math.cos(i + time / 2300);
+    }
   });
 }
 
