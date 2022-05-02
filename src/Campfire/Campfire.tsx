@@ -35,9 +35,9 @@ function setupScene(scene: BABYLON.Scene): void {
 
   scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
   scene.fogDensity = 0.01;
-  scene.fogStart = 15.0;
-  scene.fogEnd = 150.0;
-  scene.fogColor = new BABYLON.Color3(0, 0, 1);
+  scene.fogStart = 32.0;
+  scene.fogEnd = 96.0;
+  scene.fogColor = new BABYLON.Color3(0, 0.333, 1);
   scene.fogEnabled = true;
 
   const divFps = document.getElementById("fps");
@@ -55,13 +55,13 @@ function createCamera(
   scene: BABYLON.Scene,
   canvas: HTMLCanvasElement,
 ): PanningCamera {
-  const fixedAngle = Math.PI / 4;
+  const fixedAngle = Math.PI / 5;
 
   const camera = new PanningCamera(
     "camera",
     0,
     fixedAngle,
-    15,
+    25,
     new BABYLON.Vector3(0, 0, 0),
   );
   camera.lowerAlphaLimit = 0;
@@ -104,8 +104,8 @@ function createCamera(
   defaultPipeline.imageProcessing.vignetteWeight = 5;
   defaultPipeline.imageProcessing.vignetteColor = new BABYLON.Color4(
     0,
-    0,
-    0,
+    0.1,
+    0.2,
     0,
   );
 
@@ -121,7 +121,7 @@ async function loadGroundAndFlame(
   const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
 
   // and scale down to better match camera
-  const DOWNSCALE = 0.2;
+  const DOWNSCALE = 0.33;
   const scaling = new BABYLON.Vector3(DOWNSCALE, DOWNSCALE, DOWNSCALE);
   data.meshes[0].scaling = scaling;
 
@@ -129,12 +129,12 @@ async function loadGroundAndFlame(
   const groundMesh = data.meshes.find((mesh) => mesh.name == "BGPlane");
   if (groundMesh) {
     // move it further down for more abstract look
-    const LOWER_GROUND_BY_Z = 20;
+    const LOWER_GROUND_BY_Z = 5;
     groundMesh.position = groundMesh.position.add(
       BABYLON.Vector3.Down().scale(LOWER_GROUND_BY_Z),
     );
 
-    const PARALLAX_FACTOR = -2; // 0 means no parallax
+    const PARALLAX_FACTOR = -5; // 0 means no parallax
     const offset = camera.position.subtract(groundMesh.position);
     scene.onBeforeRenderObservable.add(() => {
       groundMesh.position = new BABYLON.Vector3(
@@ -156,11 +156,11 @@ function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
 
   const hemiLight = new BABYLON.HemisphericLight(
     "hemiLight",
-    new BABYLON.Vector3(0, 1, 0),
+    new BABYLON.Vector3(0, 1, 1),
     scene,
   );
-  hemiLight.diffuse = new BABYLON.Color3(0, 1, 0.78);
-  hemiLight.specular = new BABYLON.Color3(0, 1, 0.78);
+  hemiLight.diffuse = new BABYLON.Color3(0, 0.333, 1);
+  hemiLight.specular = new BABYLON.Color3(0, 0.333, 1);
   hemiLight.intensity = 0.2;
 
   const pointLight = new BABYLON.PointLight(
@@ -168,9 +168,9 @@ function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
     new BABYLON.Vector3(0, 7, 0),
     scene,
   );
-  pointLight.diffuse = new BABYLON.Color3(0, 1, 0.78);
-  pointLight.specular = new BABYLON.Color3(0, 1, 0.78);
-  pointLight.intensity = 1500;
+  pointLight.diffuse = new BABYLON.Color3(0, 0.333, 1);
+  pointLight.specular = new BABYLON.Color3(0, 0.333, 1);
+  pointLight.intensity = 2500;
 
   return pointLight;
 }
@@ -209,7 +209,7 @@ function animateFlameAndLight(
   );
   animLight.setKeys([
     { frame: 0, value: 500 },
-    { frame: 50, value: 1000 },
+    { frame: 50, value: 5000 },
     { frame: 100, value: 500 },
   ]);
   animLight.setEasingFunction(easingFunction);
@@ -255,7 +255,6 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
   // Optimizers after first setParticles() call
   // This will be used only for the next setParticles() calls
   sps.computeParticleTexture = false;
-
   let time = 0;
   scene.onBeforeRenderObservable.add(() => {
     // rotate billboards
@@ -270,11 +269,11 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
 }
 
 function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
-  const AMOUNT_INIT = 25;
-  const RADIUS_INIT = 2.4;
-  const RADIUS_INCREMENT = 1.0;
+  const AMOUNT_INIT = 20;
+  const RADIUS_INIT = 2.75;
+  const RADIUS_INCREMENT = 1.2;
 
-  const POSITION_RANDOMNESS = 0.35;
+  const POSITION_RANDOMNESS = 0.55;
   const POSITION_Y = 0.55;
 
   const SCALE_MIN = 0.2;
@@ -282,11 +281,9 @@ function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
 
   const GRADIENT = [
     // NOTE: at least 2 points required!
-    { amount: 0, color: new BABYLON.Color4(1, 1, 1) },
-    { amount: 500, color: new BABYLON.Color4(1, 0, 0) },
-    { amount: 1000, color: new BABYLON.Color4(0, 1, 0) },
-    { amount: 4000, color: new BABYLON.Color4(0, 0, 1) },
-    { amount: 10000, color: new BABYLON.Color4(0, 1, 1) },
+    { amount: 0, color: new BABYLON.Color4(0.1, 1, 0.8) },
+    { amount: 2000, color: new BABYLON.Color4(1, 0.66, 0.1) },
+    { amount: 10000, color: new BABYLON.Color4(1, 0.1, 0.2) },
   ];
 
   let currentCircleFlameyId = 0;
