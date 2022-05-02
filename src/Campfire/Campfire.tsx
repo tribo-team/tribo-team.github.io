@@ -189,7 +189,7 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
   spsMesh.material = flameyMat;
 
   sps.initParticles = () => {
-    positionFlameys(sps);
+    setupIndividualFlameys(sps);
   };
 
   sps.billboard = true;
@@ -207,20 +207,24 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
   });
 }
 
-function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
-  const AMOUNT_INIT = 20;
+function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
+  const AMOUNT_INIT = 25;
   const RADIUS_INIT = 2.4;
   const RADIUS_INCREMENT = 1.0;
-  const PREFERRED_ARC_DISTANCE = (2 * Math.PI * RADIUS_INIT) / AMOUNT_INIT;
 
-  const POSITION_RANDOMNESS = 0.4;
+  const POSITION_RANDOMNESS = 0.35;
   const POSITION_Y = 0.55;
 
   const SCALE_MIN = 0.2;
   const SCALE_MAX = 0.3;
 
-  const COLOR_A = new BABYLON.Color4(0, 1, 0.78);
-  const COLOR_B = new BABYLON.Color4(1, 0, 0);
+  const COLORS_FOR_AMOUNTS = [
+    { amount: 0, color: new BABYLON.Color4(1, 1, 1) },
+    { amount: 200, color: new BABYLON.Color4(1, 0, 0) },
+    { amount: 500, color: new BABYLON.Color4(0, 1, 0) },
+    { amount: 2000, color: new BABYLON.Color4(0, 0, 1) },
+    { amount: 4000, color: new BABYLON.Color4(0, 1, 1) },
+  ];
 
   let currentCircleFlameyId = 0;
   let currentRadius = RADIUS_INIT;
@@ -228,6 +232,8 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
   let currentAngleOffset = false;
   let currentCircleMaxAmt = AMOUNT_INIT;
   let nbLeftToDistribute = sps.nbParticles;
+
+  const PREFERRED_ARC_DISTANCE = (2 * Math.PI * RADIUS_INIT) / AMOUNT_INIT;
 
   for (let i = 0; i < sps.nbParticles; i++) {
     const particle = sps.particles[i];
@@ -252,8 +258,13 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
       randomScale,
     );
 
-    // lerp color
-    particle.color = BABYLON.Color4.Lerp(COLOR_A, COLOR_B, currentRadius / 30);
+    // color
+    const colorForAmount = COLORS_FOR_AMOUNTS.reduce(
+      (previousValue, currentValue) =>
+        currentValue.amount < i ? currentValue : previousValue,
+      COLORS_FOR_AMOUNTS[0],
+    );
+    particle.color = colorForAmount.color;
 
     // circle switching logic
     if (currentCircleFlameyId < currentCircleMaxAmt - 1) {
