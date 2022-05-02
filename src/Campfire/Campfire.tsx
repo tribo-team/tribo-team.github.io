@@ -233,12 +233,13 @@ function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
   const SCALE_MIN = 0.2;
   const SCALE_MAX = 0.3;
 
-  const COLORS_FOR_AMOUNTS = [
+  const GRADIENT = [
+    // NOTE: at least 2 points required!
     { amount: 0, color: new BABYLON.Color4(1, 1, 1) },
-    { amount: 200, color: new BABYLON.Color4(1, 0, 0) },
-    { amount: 500, color: new BABYLON.Color4(0, 1, 0) },
-    { amount: 2000, color: new BABYLON.Color4(0, 0, 1) },
-    { amount: 4000, color: new BABYLON.Color4(0, 1, 1) },
+    { amount: 500, color: new BABYLON.Color4(1, 0, 0) },
+    { amount: 1000, color: new BABYLON.Color4(0, 1, 0) },
+    { amount: 4000, color: new BABYLON.Color4(0, 0, 1) },
+    { amount: 10000, color: new BABYLON.Color4(0, 1, 1) },
   ];
 
   let currentCircleFlameyId = 0;
@@ -273,13 +274,28 @@ function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
       randomScale,
     );
 
-    // color
-    const colorForAmount = COLORS_FOR_AMOUNTS.reduce(
-      (previousValue, currentValue) =>
-        currentValue.amount < i ? currentValue : previousValue,
-      COLORS_FOR_AMOUNTS[0],
+    // color gradient calculation
+    let gradienAnchor = 0;
+    for (; gradienAnchor < GRADIENT.length - 1; gradienAnchor++) {
+      if (
+        GRADIENT[gradienAnchor].amount <= i &&
+        i < GRADIENT[gradienAnchor + 1].amount
+      )
+        break;
+    }
+    if (gradienAnchor == GRADIENT.length - 1) {
+      gradienAnchor = GRADIENT.length - 2; // fallback to last
+    }
+
+    const lerpFactor =
+      (i - GRADIENT[gradienAnchor].amount) /
+      (GRADIENT[gradienAnchor + 1].amount - GRADIENT[gradienAnchor].amount);
+
+    particle.color = BABYLON.Color4.Lerp(
+      GRADIENT[gradienAnchor].color,
+      GRADIENT[gradienAnchor + 1].color,
+      lerpFactor,
     );
-    particle.color = colorForAmount.color;
 
     // circle switching logic
     if (currentCircleFlameyId < currentCircleMaxAmt - 1) {
