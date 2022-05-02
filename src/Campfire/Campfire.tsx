@@ -30,9 +30,8 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
 };
 
 function setupScene(scene: BABYLON.Scene): void {
-
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 1.0);
-  scene.ambientColor = new BABYLON.Color3(0,0,0);
+  scene.ambientColor = new BABYLON.Color3(0, 0, 0);
 
   scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
   scene.fogDensity = 0.01;
