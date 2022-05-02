@@ -30,7 +30,16 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
 };
 
 function setupScene(scene: BABYLON.Scene): void {
-  scene.clearColor = new BABYLON.Color4(0.15, 0.03, 0.29, 1.0);
+
+  scene.clearColor = new BABYLON.Color4(0, 0, 0, 1.0);
+  scene.ambientColor = new BABYLON.Color3(0,0,0);
+
+  scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+  scene.fogDensity = 0.01;
+  scene.fogStart = 15.0;
+  scene.fogEnd = 150.0;
+  scene.fogColor = new BABYLON.Color3(0, 0, 1);
+  scene.fogEnabled = true;
 
   const divFps = document.getElementById("fps");
   scene.getEngine().runRenderLoop(() => {
@@ -67,8 +76,8 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
   camera.panningAxis = new BABYLON.Vector3(1, 0, 1);
   camera.panningDistanceLimit = 40;
   camera.panningSensibility = 500;
-  camera.panningInertia = 0.85;
-  camera.inertia = 0.85;
+  camera.panningInertia = 0.95;
+  camera.inertia = 0.95;
 
   return camera;
 }
@@ -78,7 +87,7 @@ async function loadGroundAndFlame(
   camera: PanningCamera,
 ): Promise<BABYLON.AbstractMesh> {
   // Import
-  const url = "https://dl.dropbox.com/s/pbczbdwdjef9tre/triboscene.glb";
+  const url = "https://dl.dropbox.com/s/ang88plen9d2w3v/triboscene.glb";
   const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
 
   // and scale down to better match camera
