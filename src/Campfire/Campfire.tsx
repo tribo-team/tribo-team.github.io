@@ -19,7 +19,7 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
   scene.getEngine().displayLoadingUI(); // TODO: use proper screen
 
   setupScene(scene);
-  const camera = createCamera(canvas);
+  const camera = createCamera(scene, canvas);
   const flame = await loadGroundAndFlame(scene, camera);
   const pointLight = createLightAndShadows(scene);
   animateFlameAndLight(pointLight, flame, scene);
@@ -43,7 +43,10 @@ function setupScene(scene: BABYLON.Scene): void {
   });
 }
 
-function createCamera(canvas: HTMLCanvasElement): PanningCamera {
+function createCamera(
+  scene: BABYLON.Scene,
+  canvas: HTMLCanvasElement,
+): PanningCamera {
   const fixedAngle = Math.PI / 4;
 
   const camera = new PanningCamera(
@@ -69,6 +72,34 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
   camera.panningSensibility = 500;
   camera.panningInertia = 0.85;
   camera.inertia = 0.85;
+
+  // Configure rendering effects
+  const defaultPipeline = new BABYLON.DefaultRenderingPipeline(
+    "defaultPipeline",
+    true,
+    scene,
+    [camera],
+  );
+  const curve = new BABYLON.ColorCurves();
+  // curve.globalHue = 200;
+  // curve.globalDensity = 80;
+  curve.globalSaturation = 80;
+  // curve.highlightsHue = 20;
+  // curve.highlightsDensity = 80;
+  // curve.highlightsSaturation = -80;
+  // curve.shadowsHue = 2;
+  // curve.shadowsDensity = 80;
+  // curve.shadowsSaturation = 40;
+  defaultPipeline.imageProcessing.colorCurves = curve;
+
+  defaultPipeline.imageProcessing.vignetteEnabled = true;
+  defaultPipeline.imageProcessing.vignetteWeight = 5;
+  defaultPipeline.imageProcessing.vignetteColor = new BABYLON.Color4(
+    0,
+    0,
+    0,
+    0,
+  );
 
   return camera;
 }
