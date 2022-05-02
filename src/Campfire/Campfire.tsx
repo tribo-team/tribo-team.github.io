@@ -20,7 +20,7 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
 
   setupScene(scene);
   const camera = createCamera(canvas);
-  const flame = await loadEnvironment(scene, camera);
+  const flame = await loadGroundAndFlame(scene, camera);
   const pointLight = createLightAndShadows(scene);
   animateFlameAndLight(pointLight, flame, scene);
 
@@ -73,26 +73,41 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
   return camera;
 }
 
-async function loadEnvironment(
+async function loadGroundAndFlame(
   scene: BABYLON.Scene,
   camera: PanningCamera,
 ): Promise<BABYLON.AbstractMesh> {
+  // Import
   const url = "https://dl.dropbox.com/s/pbczbdwdjef9tre/triboscene.glb";
-  const scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
-
   const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
+
+  // and scale down to better match camera
+  const DOWNSCALE = 0.2;
+  const scaling = new BABYLON.Vector3(DOWNSCALE, DOWNSCALE, DOWNSCALE);
   data.meshes[0].scaling = scaling;
 
+  // Make ground mesh follow camera
+  const groundMesh = data.meshes.find((mesh) => mesh.name == "BGPlane");
+  if (groundMesh) {
+    // move it further down for more abstract look
+    const LOWER_GROUND_BY_Z = 20;
+    groundMesh.position = groundMesh.position.add(
+      BABYLON.Vector3.Down().scale(LOWER_GROUND_BY_Z),
+    );
+
+    const PARALLAX_FACTOR = -2; // 0 means no parallax
+    const offset = camera.position.subtract(groundMesh.position);
+    scene.onBeforeRenderObservable.add(() => {
+      groundMesh.position = new BABYLON.Vector3(
+        offset.x + PARALLAX_FACTOR * camera.position.x,
+        groundMesh.position.y,
+        offset.z + PARALLAX_FACTOR * camera.position.z,
+      );
+    });
+  }
+
+  // Return flame mesh for future programmatic animation
   const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
-
-  // scene.onBeforeRenderObservable.add(() => {
-  //   data.meshes[0].position = new BABYLON.Vector3(
-  //     camera.position.x,
-  //     camera.position.y - 11,
-  //     camera.position.z,
-  //   );
-  // });
-
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return flameMesh!; // we know it's in the scene
 }
