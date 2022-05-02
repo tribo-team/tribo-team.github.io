@@ -19,8 +19,8 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
   scene.getEngine().displayLoadingUI(); // TODO: use proper screen
 
   setupScene(scene);
-  createCamera(canvas);
-  const flame = await loadEnvironment();
+  const camera = createCamera(canvas);
+  const flame = await loadEnvironment(scene, camera);
   const pointLight = createLightAndShadows(scene);
   animateFlameAndLight(pointLight, flame, scene);
 
@@ -73,7 +73,10 @@ function createCamera(canvas: HTMLCanvasElement): PanningCamera {
   return camera;
 }
 
-async function loadEnvironment(): Promise<BABYLON.AbstractMesh> {
+async function loadEnvironment(
+  scene: BABYLON.Scene,
+  camera: PanningCamera,
+): Promise<BABYLON.AbstractMesh> {
   const url = "https://dl.dropbox.com/s/pbczbdwdjef9tre/triboscene.glb";
   const scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
 
@@ -81,6 +84,14 @@ async function loadEnvironment(): Promise<BABYLON.AbstractMesh> {
   data.meshes[0].scaling = scaling;
 
   const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
+
+  // scene.onBeforeRenderObservable.add(() => {
+  //   data.meshes[0].position = new BABYLON.Vector3(
+  //     camera.position.x,
+  //     camera.position.y - 11,
+  //     camera.position.z,
+  //   );
+  // });
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return flameMesh!; // we know it's in the scene
@@ -197,22 +208,26 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
 }
 
 function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
-  const R_INIT = 2.4;
-  const R_INC = 0.8;
-  const R_INC_MULT = 1.0;
-  const AMT_INIT = 20;
-  const AMT_MULT = 1.1;
+  const AMOUNT_INIT = 20;
+  const RADIUS_INIT = 2.4;
+  const RADIUS_INCREMENT = 1.0;
+  const PREFERRED_ARC_DISTANCE = (2 * Math.PI * RADIUS_INIT) / AMOUNT_INIT;
+
+  const POSITION_RANDOMNESS = 0.4;
+  const POSITION_Y = 0.55;
+
+  const SCALE_MIN = 0.2;
+  const SCALE_MAX = 0.3;
 
   const COLOR_A = new BABYLON.Color4(0, 1, 0.78);
   const COLOR_B = new BABYLON.Color4(1, 0, 0);
 
   let currentCircleFlameyId = 0;
-  let currentRadius = R_INIT;
-  let currentRadiusIncrement = R_INC;
-  let currentAngleStep = (2 * Math.PI) / AMT_INIT;
+  let currentRadius = RADIUS_INIT;
+  let currentAngleStep = (2 * Math.PI) / AMOUNT_INIT;
   let currentAngleOffset = false;
-  let currentCircleMaxAmt = AMT_INIT;
-  let amtLeftToDistribute = sps.nbParticles;
+  let currentCircleMaxAmt = AMOUNT_INIT;
+  let nbLeftToDistribute = sps.nbParticles;
 
   for (let i = 0; i < sps.nbParticles; i++) {
     const particle = sps.particles[i];
@@ -224,14 +239,13 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
     }
 
     particle.position = new BABYLON.Vector3(
-      currentRadius * Math.cos(angle) + Math.random() * 0.4,
-      0.55,
-      currentRadius * Math.sin(angle) + Math.random() * 0.4,
+      currentRadius * Math.cos(angle) + Math.random() * POSITION_RANDOMNESS,
+      POSITION_Y,
+      currentRadius * Math.sin(angle) + Math.random() * POSITION_RANDOMNESS,
     );
-    // TODO: it might make sense to cache these to optimize later?
 
     // a bit of random scaling
-    const randomScale = BABYLON.Scalar.RandomRange(0.2, 0.3);
+    const randomScale = BABYLON.Scalar.RandomRange(SCALE_MIN, SCALE_MAX);
     particle.scaling = new BABYLON.Vector3(
       randomScale,
       randomScale,
@@ -241,30 +255,25 @@ function positionFlameys(sps: BABYLON.SolidParticleSystem): void {
     // lerp color
     particle.color = BABYLON.Color4.Lerp(COLOR_A, COLOR_B, currentRadius / 30);
 
-    // figure out if we should stay on the same circle radius
+    // circle switching logic
     if (currentCircleFlameyId < currentCircleMaxAmt - 1) {
       currentCircleFlameyId++;
     } else {
+      // next circle starts
       currentCircleFlameyId = 0;
-
-      currentRadius += currentRadiusIncrement;
-      currentRadiusIncrement *= R_INC_MULT;
-
+      currentRadius += RADIUS_INCREMENT;
       currentAngleOffset = !currentAngleOffset;
+      nbLeftToDistribute -= currentCircleMaxAmt;
 
-      amtLeftToDistribute -= currentCircleMaxAmt;
+      currentCircleMaxAmt = Math.floor(
+        (2 * Math.PI * currentRadius) / PREFERRED_ARC_DISTANCE,
+      );
 
-      const prevCurrentCircleMaxAmt = currentCircleMaxAmt;
-      currentCircleMaxAmt = Math.round(currentCircleMaxAmt * AMT_MULT);
-
-      if (
-        0 < amtLeftToDistribute &&
-        amtLeftToDistribute < currentCircleMaxAmt
-      ) {
-        currentAngleStep = (2 * Math.PI) / amtLeftToDistribute;
-      } else {
-        currentAngleStep /= currentCircleMaxAmt / prevCurrentCircleMaxAmt;
-      }
+      const divisions =
+        0 < nbLeftToDistribute && nbLeftToDistribute < currentCircleMaxAmt
+          ? nbLeftToDistribute
+          : currentCircleMaxAmt;
+      currentAngleStep = (2 * Math.PI) / divisions;
     }
   }
 }
