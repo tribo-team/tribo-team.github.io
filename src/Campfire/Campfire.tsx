@@ -37,7 +37,7 @@ function setupScene(scene: BABYLON.Scene): void {
   scene.fogDensity = 0.01;
   scene.fogStart = 32.0;
   scene.fogEnd = 96.0;
-  scene.fogColor = new BABYLON.Color3(0, 0.333, 1);
+  scene.fogColor = new BABYLON.Color3(0, 0.55, 1);
   scene.fogEnabled = true;
 
   const divFps = document.getElementById("fps");
@@ -134,7 +134,7 @@ async function loadGroundAndFlame(
       BABYLON.Vector3.Down().scale(LOWER_GROUND_BY_Z),
     );
 
-    const PARALLAX_FACTOR = -5; // 0 means no parallax
+    const PARALLAX_FACTOR = -2.5; // 0 means no parallax
     const offset = camera.position.subtract(groundMesh.position);
     scene.onBeforeRenderObservable.add(() => {
       groundMesh.position = new BABYLON.Vector3(
@@ -270,7 +270,7 @@ function createFlameys(numberOfFlameys: number, scene: BABYLON.Scene): void {
 
 function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
   const AMOUNT_INIT = 20;
-  const RADIUS_INIT = 2.75;
+  const RADIUS_INIT = 3;
   const RADIUS_INCREMENT = 1.2;
 
   const POSITION_RANDOMNESS = 0.55;
@@ -281,8 +281,9 @@ function setupIndividualFlameys(sps: BABYLON.SolidParticleSystem): void {
 
   const GRADIENT = [
     // NOTE: at least 2 points required!
-    { amount: 0, color: new BABYLON.Color4(0.1, 1, 0.8) },
-    { amount: 2000, color: new BABYLON.Color4(1, 0.66, 0.1) },
+    { amount: 0, color: new BABYLON.Color4(0.5, 2, 1.5) },
+    { amount: 100, color: new BABYLON.Color4(0.1, 1, 0.8) },
+    { amount: 1000, color: new BABYLON.Color4(1, 0.66, 0.1) },
     { amount: 10000, color: new BABYLON.Color4(1, 0.1, 0.2) },
   ];
 
