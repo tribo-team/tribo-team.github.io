@@ -30,6 +30,7 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
 };
 
 function setupScene(scene: BABYLON.Scene): void {
+
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 1.0);
   scene.ambientColor = new BABYLON.Color3(0, 0, 0);
 
@@ -121,7 +122,7 @@ async function loadGroundAndFlame(
   const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
 
   // and scale down to better match camera
-  const SETSCALE = 1.25;
+  const SETSCALE = 1.1;
   const scaling = new BABYLON.Vector3(SETSCALE, SETSCALE, SETSCALE);
   data.meshes[0].scaling = scaling;
 
@@ -145,11 +146,39 @@ async function loadGroundAndFlame(
     });
   }
 
-  // Return flame mesh for future programmatic animation
-  const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
+  const campFireMesh = data.meshes.find((mesh) => mesh.name == "Flame");
+
+  if (campFireMesh) {
+    
+    const campfireMaterial = new BABYLON.StandardMaterial("campfireMat", scene);
+
+    campfireMaterial.disableLighting = true;
+
+    campfireMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    campfireMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    campfireMaterial.specularPower = 16;
+
+    // Fresnel
+
+    campfireMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+    campfireMaterial.emissiveFresnelParameters.bias = 0.5;
+    campfireMaterial.emissiveFresnelParameters.power = 8;
+    campfireMaterial.emissiveFresnelParameters.leftColor = new BABYLON.Color3(1, 1, 1);
+    campfireMaterial.emissiveFresnelParameters.rightColor = new BABYLON.Color3(0.5, 0.90, 1);
+
+    campFireMesh.material = campfireMaterial;
+    var campfireScale = new BABYLON.Vector3(1.33,1.33,1.33);
+    campFireMesh.scaling = campfireScale;
+  }
+
+    // Return flame mesh for future programmatic animation
+    const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
+
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return flameMesh!; // we know it's in the scene
 }
+
+
 
 function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
   scene.createDefaultEnvironment();
