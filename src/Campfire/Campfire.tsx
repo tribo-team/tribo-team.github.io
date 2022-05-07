@@ -117,12 +117,12 @@ async function loadGroundAndFlame(
   camera: PanningCamera,
 ): Promise<BABYLON.AbstractMesh> {
   // Import
-  const url = "https://dl.dropbox.com/s/ang88plen9d2w3v/triboscene.glb";
+  const url = "https://dl.dropbox.com/s/5vb65ouihq40ds8/flame.glb";
   const data = await BABYLON.SceneLoader.ImportMeshAsync("", url);
 
   // and scale down to better match camera
-  const DOWNSCALE = 0.33;
-  const scaling = new BABYLON.Vector3(DOWNSCALE, DOWNSCALE, DOWNSCALE);
+  const SETSCALE = 1.25;
+  const scaling = new BABYLON.Vector3(SETSCALE, SETSCALE, SETSCALE);
   data.meshes[0].scaling = scaling;
 
   // Make ground mesh follow camera
@@ -134,7 +134,7 @@ async function loadGroundAndFlame(
       BABYLON.Vector3.Down().scale(LOWER_GROUND_BY_Z),
     );
 
-    const PARALLAX_FACTOR = -2.5; // 0 means no parallax
+    const PARALLAX_FACTOR = -0.25; // 0 means no parallax
     const offset = camera.position.subtract(groundMesh.position);
     scene.onBeforeRenderObservable.add(() => {
       groundMesh.position = new BABYLON.Vector3(
