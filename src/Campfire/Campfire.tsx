@@ -30,7 +30,6 @@ const onSceneMount = async (e: SceneEventArgs): Promise<void> => {
 };
 
 function setupScene(scene: BABYLON.Scene): void {
-
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 1.0);
   scene.ambientColor = new BABYLON.Color3(0, 0, 0);
 
@@ -149,7 +148,6 @@ async function loadGroundAndFlame(
   const campFireMesh = data.meshes.find((mesh) => mesh.name == "Flame");
 
   if (campFireMesh) {
-    
     const campfireMaterial = new BABYLON.StandardMaterial("campfireMat", scene);
 
     campfireMaterial.disableLighting = true;
@@ -160,25 +158,30 @@ async function loadGroundAndFlame(
 
     // Fresnel
 
-    campfireMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+    campfireMaterial.emissiveFresnelParameters =
+      new BABYLON.FresnelParameters();
     campfireMaterial.emissiveFresnelParameters.bias = 0.5;
     campfireMaterial.emissiveFresnelParameters.power = 8;
-    campfireMaterial.emissiveFresnelParameters.leftColor = new BABYLON.Color3(1, 1, 1);
-    campfireMaterial.emissiveFresnelParameters.rightColor = new BABYLON.Color3(0.5, 0.90, 1);
+    campfireMaterial.emissiveFresnelParameters.leftColor = new BABYLON.Color3(
+      1,
+      1,
+      1,
+    );
+    campfireMaterial.emissiveFresnelParameters.rightColor = new BABYLON.Color3(
+      0.5,
+      0.9,
+      1,
+    );
 
     campFireMesh.material = campfireMaterial;
-    var campfireScale = new BABYLON.Vector3(1.33,1.33,1.33);
+    const campfireScale = new BABYLON.Vector3(1.33, 1.33, 1.33);
     campFireMesh.scaling = campfireScale;
   }
 
-    // Return flame mesh for future programmatic animation
-    const flameMesh = data.meshes.find((mesh) => mesh.name == "Flame");
-
+  // Return flame mesh for future programmatic animation
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return flameMesh!; // we know it's in the scene
+  return campFireMesh!; // we know it's in the scene
 }
-
-
 
 function createLightAndShadows(scene: BABYLON.Scene): BABYLON.PointLight {
   scene.createDefaultEnvironment();
