@@ -149,10 +149,12 @@ async function loadGroundAndFlame(
 
   if (campFireMesh) {
     const campfireMaterial = new BABYLON.StandardMaterial("campfireMat", scene);
+    const campfireTexture = new BABYLON.Texture(
+      "https://dl.dropbox.com/s/prhdjo2403h3vp9/flametexture.png",
+    );
 
     campfireMaterial.disableLighting = true;
-
-    campfireMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    campfireMaterial.diffuseTexture = campfireTexture;
     campfireMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
     campfireMaterial.specularPower = 16;
 
@@ -161,16 +163,16 @@ async function loadGroundAndFlame(
     campfireMaterial.emissiveFresnelParameters =
       new BABYLON.FresnelParameters();
     campfireMaterial.emissiveFresnelParameters.bias = 0.5;
-    campfireMaterial.emissiveFresnelParameters.power = 8;
+    campfireMaterial.emissiveFresnelParameters.power = 100;
     campfireMaterial.emissiveFresnelParameters.leftColor = new BABYLON.Color3(
       1,
       1,
       1,
     );
     campfireMaterial.emissiveFresnelParameters.rightColor = new BABYLON.Color3(
-      0.5,
-      0.9,
-      1,
+      0.65,
+      0.85,
+      0.95,
     );
 
     campFireMesh.material = campfireMaterial;
