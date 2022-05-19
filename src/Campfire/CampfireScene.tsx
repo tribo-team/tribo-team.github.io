@@ -11,7 +11,7 @@ import React from "react";
 
 type Props = {
   flameyAmount: number;
-  onFlameyPicked: (idx: number) => void;
+  onFlameyPicked?: (idx: number) => void;
 };
 
 export class CampfireScene extends React.Component<Props> {
@@ -39,16 +39,14 @@ export class CampfireScene extends React.Component<Props> {
   }
 
   render(): JSX.Element {
+    /* {<span id="fps">0</span>} */
     return (
       <>
-        <div style={{ flex: 1, display: "flex" }}>
-          <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
-            <Scene onSceneMount={this.onSceneMount}>
-              <></>
-            </Scene>
-          </Engine>
-        </div>
-        {<span id="fps">0</span>}
+        <Engine antialias={false} adaptToDeviceRatio canvasId="BabylonJS">
+          <Scene onSceneMount={this.onSceneMount}>
+            <></>
+          </Scene>
+        </Engine>
       </>
     );
   }
@@ -277,7 +275,7 @@ export class CampfireScene extends React.Component<Props> {
     }
 
     this.sps = new BABYLON.SolidParticleSystem("sps", this.scene, {
-      isPickable: true,
+      isPickable: this.props.onFlameyPicked !== undefined,
     });
     const sps = this.sps;
 
@@ -416,13 +414,13 @@ export class CampfireScene extends React.Component<Props> {
 
   setupAllSceneCallbacks = (): void => {
     // Main rendering loop, update fps
-    const divFps = document.getElementById("fps");
+    // const divFps = document.getElementById("fps");
     this.scene.getEngine().runRenderLoop(() => {
       if (this.scene) {
         this.scene.render();
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        divFps!.innerHTML = this.scene.getEngine().getFps().toFixed() + " fps";
+        // divFps!.innerHTML = this.scene.getEngine().getFps().toFixed() + " fps";
       }
     });
 
@@ -444,6 +442,7 @@ export class CampfireScene extends React.Component<Props> {
     // Individual particle selection
     this.scene.onPointerPick = (evt, pickResult) => {
       if (!this.sps) return;
+      if (!this.props.onFlameyPicked) return;
 
       if (pickResult.pickedMesh !== this.sps.mesh || pickResult.faceId === -1) {
         return;
