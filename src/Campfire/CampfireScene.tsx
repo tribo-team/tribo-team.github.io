@@ -7,6 +7,7 @@ import {
 } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 import { PanningCamera } from "./PanningCamera";
+import { LoadingScreen } from "./LoadingScreen";
 import React from "react";
 
 type Props = {
@@ -55,9 +56,14 @@ export class CampfireScene extends React.Component<Props> {
     this.canvas = e.canvas;
     this.scene = e.scene;
 
-    // TODO: use proper loading screen
+    // Show loading screen
+    this.scene.getEngine().loadingScreen = new LoadingScreen(
+      this.scene,
+      "Invisible loading text",
+      "#000000",
+    );
     this.scene.getEngine().displayLoadingUI();
-    {
+
       this.setupScene();
       this.createCamera();
       await this.loadGroundAndFlame();
@@ -65,8 +71,11 @@ export class CampfireScene extends React.Component<Props> {
       this.animateFlameAndLight();
       this.createFlameys();
       this.setupAllSceneCallbacks();
-    }
+
+    // Hide loading screen
+    this.scene.executeWhenReady(() => {
     this.scene.getEngine().hideLoadingUI();
+    });
   };
 
   setupScene = (): void => {
