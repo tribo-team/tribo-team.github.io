@@ -39,8 +39,6 @@ export class LoadingScreen implements ILoadingScreen {
     const deltaTime = this.scene.getEngine().getDeltaTime();
     this._loadingContainer.alpha -= 0.0025 * deltaTime;
 
-    console.log("fade", this._loadingContainer.alpha);
-
     if (this._loadingContainer.alpha <= 0.0) {
       this._loadingContainer.alpha = 0.0;
       this.scene.unregisterBeforeRender(this.fadeLoadingScreen);
