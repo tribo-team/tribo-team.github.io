@@ -1,12 +1,8 @@
 import { Engine, Scene, SceneEventArgs } from "react-babylonjs";
 import * as BABYLON from "@babylonjs/core";
-import {
-  ArcRotateCameraKeyboardMoveInput,
-  ArcRotateCameraMouseWheelInput,
-  ArcRotateCameraPointersInput,
-} from "@babylonjs/core";
+import { ArcRotateCameraPointersInput } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
-import { PanningCamera } from "./PanningCamera";
+import { LoadingScreen } from "./LoadingScreen";
 import React from "react";
 
 type Props = {
@@ -17,7 +13,7 @@ type Props = {
 export class CampfireScene extends React.Component<Props> {
   scene!: BABYLON.Scene;
   canvas!: HTMLCanvasElement;
-  camera!: PanningCamera;
+  camera!: BABYLON.ArcRotateCamera;
   pointLight!: BABYLON.PointLight;
   flame!: BABYLON.AbstractMesh;
   groundMesh!: BABYLON.AbstractMesh;
@@ -55,9 +51,14 @@ export class CampfireScene extends React.Component<Props> {
     this.canvas = e.canvas;
     this.scene = e.scene;
 
-    // TODO: use proper loading screen
+    // Show loading screen
+    this.scene.getEngine().loadingScreen = new LoadingScreen(
+      this.scene,
+      "Invisible loading text",
+      "#000000",
+    );
     this.scene.getEngine().displayLoadingUI();
-    {
+
       this.setupScene();
       this.createCamera();
       await this.loadGroundAndFlame();
@@ -65,8 +66,11 @@ export class CampfireScene extends React.Component<Props> {
       this.animateFlameAndLight();
       this.createFlameys();
       this.setupAllSceneCallbacks();
-    }
+
+    // Hide loading screen
+    this.scene.executeWhenReady(() => {
     this.scene.getEngine().hideLoadingUI();
+    });
   };
 
   setupScene = (): void => {
@@ -84,7 +88,7 @@ export class CampfireScene extends React.Component<Props> {
   createCamera = (): void => {
     const fixedAngle = Math.PI / 5;
 
-    const camera = new PanningCamera(
+    const camera = new BABYLON.ArcRotateCamera(
       "camera",
       0,
       fixedAngle,
@@ -98,14 +102,15 @@ export class CampfireScene extends React.Component<Props> {
 
     camera.attachControl(this.canvas, false, false);
 
-    camera.inputs.removeByType(ArcRotateCameraKeyboardMoveInput.name);
-    camera.inputs.removeByType(ArcRotateCameraMouseWheelInput.name);
+    camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
+    camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
 
     const pointersInput = camera.inputs.attached[
       "pointers"
     ] as ArcRotateCameraPointersInput;
     pointersInput.multiTouchPanAndZoom = false;
     pointersInput.multiTouchPanning = false;
+    pointersInput.pinchZoom = false;
 
     camera._panningMouseButton = 0;
     camera.panningAxis = new BABYLON.Vector3(1, 0, 1);
