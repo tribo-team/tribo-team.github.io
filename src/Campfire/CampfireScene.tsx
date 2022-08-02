@@ -2,7 +2,6 @@ import { Engine, Scene, SceneEventArgs } from "react-babylonjs";
 import * as BABYLON from "@babylonjs/core";
 import { ArcRotateCameraPointersInput } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
-import { PanningCamera } from "./PanningCamera";
 import { LoadingScreen } from "./LoadingScreen";
 import React from "react";
 
@@ -14,7 +13,7 @@ type Props = {
 export class CampfireScene extends React.Component<Props> {
   scene!: BABYLON.Scene;
   canvas!: HTMLCanvasElement;
-  camera!: PanningCamera;
+  camera!: BABYLON.ArcRotateCamera;
   pointLight!: BABYLON.PointLight;
   flame!: BABYLON.AbstractMesh;
   groundMesh!: BABYLON.AbstractMesh;
@@ -89,7 +88,7 @@ export class CampfireScene extends React.Component<Props> {
   createCamera = (): void => {
     const fixedAngle = Math.PI / 5;
 
-    const camera = new PanningCamera(
+    const camera = new BABYLON.ArcRotateCamera(
       "camera",
       0,
       fixedAngle,
