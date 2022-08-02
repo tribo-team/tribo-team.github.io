@@ -1,10 +1,6 @@
 import { Engine, Scene, SceneEventArgs } from "react-babylonjs";
 import * as BABYLON from "@babylonjs/core";
-import {
-  ArcRotateCameraKeyboardMoveInput,
-  ArcRotateCameraMouseWheelInput,
-  ArcRotateCameraPointersInput,
-} from "@babylonjs/core";
+import { ArcRotateCameraPointersInput } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 import { PanningCamera } from "./PanningCamera";
 import { LoadingScreen } from "./LoadingScreen";
@@ -107,14 +103,15 @@ export class CampfireScene extends React.Component<Props> {
 
     camera.attachControl(this.canvas, false, false);
 
-    camera.inputs.removeByType(ArcRotateCameraKeyboardMoveInput.name);
-    camera.inputs.removeByType(ArcRotateCameraMouseWheelInput.name);
+    camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
+    camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
 
     const pointersInput = camera.inputs.attached[
       "pointers"
     ] as ArcRotateCameraPointersInput;
     pointersInput.multiTouchPanAndZoom = false;
     pointersInput.multiTouchPanning = false;
+    pointersInput.pinchZoom = false;
 
     camera._panningMouseButton = 0;
     camera.panningAxis = new BABYLON.Vector3(1, 0, 1);
